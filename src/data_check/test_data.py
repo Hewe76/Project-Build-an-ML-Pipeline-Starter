@@ -60,6 +60,19 @@ def test_similar_neigh_distrib(data: pd.DataFrame, ref_data: pd.DataFrame, kl_th
     assert scipy.stats.entropy(dist1, dist2, base=2) < kl_threshold
 
 
-########################################################
-# Implement here test_row_count and test_price_range   #
-########################################################
+def test_row_count(data: pd.DataFrame):
+    """
+    Check that the dataset has a reasonable number of rows (between 1500 and 100000)
+    """
+    num_rows = data.shape[0]
+    assert 1500 < num_rows < 100000, f"Unexpected number of rows: {num_rows}"
+
+
+def test_price_range(data: pd.DataFrame, min_price: float, max_price: float):
+    """
+    Verify that all prices fall within the expected range
+    """
+    prices = data['price']
+    assert prices.between(min_price, max_price).all(), \
+        f"Found prices outside the range {min_price}–{max_price}"
+

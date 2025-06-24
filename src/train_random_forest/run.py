@@ -11,6 +11,8 @@ import matplotlib.pyplot as plt
 import mlflow
 import json
 
+import traceback
+
 import pandas as pd
 import numpy as np
 from sklearn.compose import ColumnTransformer
@@ -71,10 +73,8 @@ def go(args):
     # Then fit it to the X_train, y_train data
     logger.info("Fitting")
 
-    ######################################
     # Fit the pipeline sk_pipe by calling the .fit method on X_train and y_train
-    # YOUR CODE HERE
-    ######################################
+    sk_pipe.fit(X_train, y_train)
 
     # Compute r2 and MAE
     logger.info("Scoring")
@@ -88,40 +88,47 @@ def go(args):
 
     logger.info("Exporting model")
 
-    # Save model package in the MLFlow sklearn format
-    if os.path.exists("random_forest_dir"):
-        shutil.rmtree("random_forest_dir")
+    #Saving Model
+    logger.info("Saving model...")
+    logger.info(f"Current working directory: {os.getcwd()}")
+    logger.info(f"Can write to cwd: {os.access(os.getcwd(), os.W_OK)}")
 
-    ######################################
-    # Save the sk_pipe pipeline as a mlflow.sklearn model in the directory "random_forest_dir"
-    # HINT: use mlflow.sklearn.save_model
+    # Define the path first
+    random_forest_dir = os.path.join("models", "random_forest_model")
+
+    # Clean up existing dir if it exists
+    if os.path.exists(random_forest_dir):
+        shutil.rmtree(random_forest_dir)
+
+    # Now save the model
     mlflow.sklearn.save_model(
-        # YOUR CODE HERE
-        input_example = X_train.iloc[:5]
+        sk_model=sk_pipe,
+        path=random_forest_dir,
+        input_example=X_train.iloc[:5]
     )
-    ######################################
 
+    assert os.path.isdir(random_forest_dir), "Model directory was not created!"
+    logger.info("Model saved successfully at: %s", random_forest_dir)
 
-    # Upload the model we just exported to W&B
+    # Upload model to W&B
     artifact = wandb.Artifact(
         args.output_artifact,
-        type = 'model_export',
-        description = 'Trained ranfom forest artifact',
-        metadata = rf_config
+        type='model_export',
+        description='Trained random forest artifact',
+        metadata=rf_config
     )
-    artifact.add_dir('random_forest_dir')
+    artifact.add_dir(random_forest_dir)
     run.log_artifact(artifact)
+
 
     # Plot feature importance
     fig_feat_imp = plot_feature_importance(sk_pipe, processed_features)
 
-    ######################################
     # Here we save variable r_squared under the "r2" key
     run.summary['r2'] = r_squared
     # Now save the variable mae under the key "mae".
-    # YOUR CODE HERE
-    ######################################
-
+    run.summary['mae'] = mae
+    
     # Upload to W&B the feture importance visualization
     run.log(
         {
@@ -157,15 +164,14 @@ def get_inference_pipeline(rf_config, max_tfidf_features):
     # (nor during training). That is not true for neighbourhood_group
     ordinal_categorical_preproc = OrdinalEncoder()
 
-    ######################################
-    # Build a pipeline with two steps:
+        # Build a pipeline with two steps:
     # 1 - A SimpleImputer(strategy="most_frequent") to impute missing values
     # 2 - A OneHotEncoder() step to encode the variable
     non_ordinal_categorical_preproc = make_pipeline(
-        # YOUR CODE HERE
+        SimpleImputer(strategy="most_frequent"),
+        OneHotEncoder(handle_unknown="ignore")
     )
-    ######################################
-
+    
     # Let's impute the numerical columns to make sure we can handle missing values
     # (note that we do not scale because the RF algorithm does not need that)
     zero_imputed = [
@@ -225,7 +231,8 @@ def get_inference_pipeline(rf_config, max_tfidf_features):
 
     sk_pipe = Pipeline(
         steps =[
-        # YOUR CODE HERE
+        ("preprocessor", preprocessor),
+        ("random_forest", random_forest)
         ]
     )
 
