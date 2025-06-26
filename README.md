@@ -1,3 +1,4 @@
+
 # Build an ML Pipeline for Short-Term Rental Prices in NYC
 You are working for a property management company renting rooms and properties for short periods of 
 time on various rental platforms. You need to estimate the typical price for a given property based 
@@ -174,6 +175,12 @@ If you see the any error while running the command:
 ```
 
 Please, make sure all steps are using **the same** python version and that you have **conda installed**. Additionally, *mlflow* and *wandb* packages are crucial and should have the same version.
+
+## Project Tracking
+
+This project is tracked and logged using Weights & Biases (W&B).
+
+[View project on W&B](https://wandb.ai/hewe-western-governors-university/nyc_airbnb)
 
 
 ## License
