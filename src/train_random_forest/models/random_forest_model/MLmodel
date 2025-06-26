@@ -14,7 +14,7 @@ flavors:
     sklearn_version: 1.5.2
 mlflow_version: 2.8.1
 model_size_bytes: 60973571
-model_uuid: 5a39d2a2d32942dd83046dd06d6b1fb3
+model_uuid: 74d91ec814f547f0904b47d514127036
 saved_input_example_info:
   artifact_path: input_example.json
   pandas_orient: split
@@ -30,4 +30,4 @@ signature:
     {"type": "long", "name": "availability_365"}]'
   outputs: '[{"type": "double"}]'
   params: null
-utc_time_created: '2025-06-24 18:46:10.918534'
+utc_time_created: '2025-06-26 14:50:45.684997'

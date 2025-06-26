@@ -45,24 +45,30 @@ def go(config: DictConfig):
                 parameters={
                     "sample": config["etl"]["sample"],
                     "artifact_name": "sample.csv",
+                    "artifact_name":  config["etl"]["sample"],
                     "artifact_type": "raw_data",
                     "artifact_description": "Raw file as downloaded"
                 },
             )
 
         if "basic_cleaning" in active_steps:
+            input_artifact = config["etl"]["sample"]
+            if ":" not in input_artifact:
+                input_artifact += ":latest"
+
             _ = mlflow.run(
                 os.path.join(hydra.utils.get_original_cwd(), "src", "basic_cleaning"),
                 "main",
                 parameters={
-                    "input_artifact": config["etl"]["sample"],
+                    "input_artifact": input_artifact,
                     "output_artifact": "clean_sample.csv",
                     "output_type": "cleaned_data",
                     "output_description": "Cleaned data with outliers and geo bounds applied",
                     "min_price": config["etl"]["min_price"],
                     "max_price": config["etl"]["max_price"],
                 },
-        )   
+            )
+
 
 
         if "data_check" in active_steps:
