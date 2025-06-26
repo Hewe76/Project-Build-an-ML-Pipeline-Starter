@@ -182,6 +182,11 @@ This project is tracked and logged using Weights & Biases (W&B).
 
 [View project on W&B](https://wandb.ai/hewe-western-governors-university/nyc_airbnb)
 
+## GitHub Repository
+
+You can find the full project code here:  
+[GitHub - Project: Build an ML Pipeline Starter](https://github.com/Hewe76/Project-Build-an-ML-Pipeline-Starter.git)
+
 
 ## License
 
